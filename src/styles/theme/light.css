@@ -1,0 +1,26 @@
+/* ==========================================================
+   Light Theme
+   ========================================================== */
+
+[data-theme="light"] {
+
+  --cp-bg-primary: #F8FAFC;
+  --cp-bg-secondary: #FFFFFF;
+  --cp-bg-tertiary: #F1F5F9;
+
+  --cp-surface: #FFFFFF;
+  --cp-surface-hover: #F3F4F6;
+
+  --cp-border: #D1D5DB;
+
+  --cp-text-primary: #111827;
+  --cp-text-secondary: #374151;
+  --cp-text-muted: #6B7280;
+
+  --cp-accent: #0284C7;
+  --cp-accent-hover: #0369A1;
+
+  --cp-success: #16A34A;
+  --cp-warning: #D97706;
+  --cp-danger: #DC2626;
+}

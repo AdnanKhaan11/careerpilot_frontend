@@ -1,0 +1,23 @@
+/* =====================================================
+   CAREERPILOT DESIGN SYSTEM
+   ===================================================== */
+
+/* ---------- Tailwind ---------- */
+
+@import "tailwindcss";
+
+/* ---------- Theme ---------- */
+
+@import "./theme/variables.css";
+@import "./theme/light.css";
+@import "./theme/dark.css";
+
+/* ---------- Base ---------- */
+
+@import "./base/reset.css";
+@import "./base/typography.css";
+@import "./base/scrollbar.css";
+
+/* ---------- Animations ---------- */
+
+@import "./animations/animations.css";

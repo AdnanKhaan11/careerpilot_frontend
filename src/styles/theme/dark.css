@@ -1,0 +1,26 @@
+/* ==========================================================
+   Dark Theme
+   ========================================================== */
+
+:root {
+
+  --cp-bg-primary: #0B1220;
+  --cp-bg-secondary: #111827;
+  --cp-bg-tertiary: #1F2937;
+
+  --cp-surface: #111827;
+  --cp-surface-hover: #1F2937;
+
+  --cp-border: #263244;
+
+  --cp-text-primary: #F9FAFB;
+  --cp-text-secondary: #D1D5DB;
+  --cp-text-muted: #94A3B8;
+
+  --cp-accent: #38BDF8;
+  --cp-accent-hover: #0EA5E9;
+
+  --cp-success: #10B981;
+  --cp-warning: #F59E0B;
+  --cp-danger: #EF4444;
+}

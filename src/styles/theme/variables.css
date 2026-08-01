@@ -1,0 +1,55 @@
+/* ==========================================================
+   CareerPilot Design Tokens
+   These variables NEVER change between themes.
+   ========================================================== */
+
+:root {
+  /* ---------- Border Radius ---------- */
+  --cp-radius-xs: 4px;
+  --cp-radius-sm: 8px;
+  --cp-radius-md: 12px;
+  --cp-radius-lg: 16px;
+  --cp-radius-xl: 20px;
+  --cp-radius-2xl: 24px;
+  --cp-radius-full: 9999px;
+
+  /* ---------- Layout ---------- */
+  --cp-sidebar-width: 280px;
+  --cp-header-height: 72px;
+  --cp-content-max-width: 1600px;
+
+  /* ---------- Spacing ---------- */
+  --cp-space-1: 4px;
+  --cp-space-2: 8px;
+  --cp-space-3: 12px;
+  --cp-space-4: 16px;
+  --cp-space-5: 20px;
+  --cp-space-6: 24px;
+  --cp-space-8: 32px;
+  --cp-space-10: 40px;
+  --cp-space-12: 48px;
+
+  /* ---------- Animation ---------- */
+  --cp-duration-fast: 150ms;
+  --cp-duration-normal: 250ms;
+  --cp-duration-slow: 400ms;
+
+  --cp-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- Shadows ---------- */
+  --cp-shadow-sm: 0 2px 8px rgba(0,0,0,.08);
+
+  --cp-shadow-md:
+      0 6px 20px rgba(0,0,0,.12);
+
+  --cp-shadow-lg:
+      0 12px 40px rgba(0,0,0,.18);
+
+  /* ---------- Z Index ---------- */
+
+  --cp-z-sidebar: 100;
+  --cp-z-header: 200;
+  --cp-z-dropdown: 500;
+  --cp-z-modal: 1000;
+  --cp-z-toast: 1100;
+}

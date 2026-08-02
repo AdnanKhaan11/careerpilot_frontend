@@ -7,7 +7,9 @@ import TraceStatusBadge from "./TraceStatusBadge";
 
 export default function TraceSidebar({
   activeTraceId,
+  category,
   filter,
+  onCategoryChange,
   onFilterChange,
   onSearchChange,
   onSelect,
@@ -45,6 +47,21 @@ export default function TraceSidebar({
             </button>
           ))}
         </div>
+
+        <select
+          className="mt-3 w-full rounded-xl border border-[var(--cp-border)] bg-[var(--cp-bg-primary)] px-3 py-2 text-sm text-[var(--cp-text-muted)] outline-none focus:border-cyan-500"
+          onChange={(event) => onCategoryChange(event.target.value)}
+          value={category}
+        >
+          <option value="all">All categories</option>
+          <option value="LLM">LLM</option>
+          <option value="Tool">Tool</option>
+          <option value="Retriever">Retriever</option>
+          <option value="Memory">Memory</option>
+          <option value="Safety">Safety</option>
+          <option value="Planner">Planner</option>
+          <option value="WorkingMemory">Working Memory</option>
+        </select>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">

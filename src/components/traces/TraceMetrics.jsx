@@ -32,7 +32,7 @@ export default function TraceMetrics({ metrics, nodeCount }) {
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map(({ icon: Icon, label, suffix, value }) => (
         <div
-          className="rounded-2xl border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)] p-4"
+          className="trace-metric-card rounded-2xl border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)] p-4"
           key={label}
         >
           <div className="flex items-center justify-between text-[var(--cp-text-muted)]">

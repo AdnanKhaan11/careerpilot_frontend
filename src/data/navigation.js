@@ -4,6 +4,7 @@ import {
   Briefcase,
   Brain,
   BookOpen,
+  Activity,
   Settings,
 } from "lucide-react";
 
@@ -37,6 +38,12 @@ const navigation = [
     title: "Skills",
     path: "/skills",
     icon: BookOpen,
+  },
+  {
+    id: "traces",
+    title: "Traces",
+    path: "/traces",
+    icon: Activity,
   },
   {
     id: "settings",

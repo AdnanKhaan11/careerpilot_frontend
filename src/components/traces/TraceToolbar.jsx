@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, FileCode2, FileText, RefreshCw, ScrollText } from "lucide-react";
+import { ChevronDown, ChevronUp, FileCode2, FileText, Play, RefreshCw, ScrollText } from "lucide-react";
 
 import { getTraceExportUrl } from "../../services/traceService";
 
@@ -8,6 +8,7 @@ export default function TraceToolbar({
   onCollapseAll,
   onExpandAll,
   onRefresh,
+  onReplay,
   onToggleAutoScroll,
 }) {
   function exportTrace(format) {
@@ -30,6 +31,8 @@ export default function TraceToolbar({
         label="Auto scroll"
         onClick={onToggleAutoScroll}
       />
+
+      <ToolbarButton disabled={!activeTraceId} icon={Play} label="Replay" onClick={onReplay} />
 
       <ToolbarButton disabled={!activeTraceId} icon={FileCode2} label="Export JSON" onClick={() => exportTrace("json")} />
 

@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Save, Loader2, Brain } from "lucide-react";
 
 import { useMemoryContext } from "../../context/MemoryContext";
 
 export default function ProfileEditor() {
-  const { profile, saveProfile, saving, loading } = useMemoryContext();
+  const { profile, profileLoading, saveProfile, saving } = useMemoryContext();
 
   //------------------------------------------------------
 
@@ -23,29 +23,20 @@ export default function ProfileEditor() {
 
   //------------------------------------------------------
 
-  useEffect(() => {
-    if (!textareaRef.current) return;
-
-    textareaRef.current.focus();
-    resizeTextarea();
-  }, []);
-
-  //------------------------------------------------------
-
-  useEffect(() => {
-    resizeTextarea();
-  }, [draft]);
-
-  //------------------------------------------------------
-
-  function resizeTextarea() {
+  const resizeTextarea = useCallback(() => {
     const textarea = textareaRef.current;
 
     if (!textarea) return;
 
     textarea.style.height = "0px";
     textarea.style.height = `${Math.max(textarea.scrollHeight, 420)}px`;
-  }
+  }, []);
+
+  //------------------------------------------------------
+
+  useEffect(() => {
+    resizeTextarea();
+  }, [draft, resizeTextarea]);
 
   //------------------------------------------------------
 
@@ -149,7 +140,7 @@ export default function ProfileEditor() {
         value={draft}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        disabled={loading || saving}
+        disabled={profileLoading || saving}
         placeholder={`Example:
 
 Name: Adnan Khan

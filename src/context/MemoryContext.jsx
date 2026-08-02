@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { getProfile, updateProfile, getNotes } from "../services/memoryService";
 
@@ -15,6 +15,8 @@ export function MemoryProvider({ children }) {
 
   const [loading, setLoading] = useState(false);
 
+  const [profileLoading, setProfileLoading] = useState(false);
+
   const [saving, setSaving] = useState(false);
 
   const [error, setError] = useState("");
@@ -23,9 +25,11 @@ export function MemoryProvider({ children }) {
   // Load profile
   //------------------------------------------------------
 
-  async function loadProfile() {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
+
+      setProfileLoading(true);
 
       const response = await getProfile();
 
@@ -34,14 +38,16 @@ export function MemoryProvider({ children }) {
       setError(error.message);
     } finally {
       setLoading(false);
+
+      setProfileLoading(false);
     }
-  }
+  }, []);
 
   //------------------------------------------------------
   // Load notes
   //------------------------------------------------------
 
-  async function loadNotes(query = "") {
+  const loadNotes = useCallback(async (query = "") => {
     try {
       setLoading(true);
 
@@ -53,13 +59,13 @@ export function MemoryProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   //------------------------------------------------------
   // Save profile
   //------------------------------------------------------
 
-  async function saveProfile(content) {
+  const saveProfile = useCallback(async (content) => {
     try {
       setSaving(true);
 
@@ -71,7 +77,7 @@ export function MemoryProvider({ children }) {
     } finally {
       setSaving(false);
     }
-  }
+  }, []);
 
   //------------------------------------------------------
   // Initial Load
@@ -79,8 +85,7 @@ export function MemoryProvider({ children }) {
 
   useEffect(() => {
     loadProfile();
-    loadNotes();
-  }, []);
+  }, [loadProfile]);
 
   //------------------------------------------------------
 
@@ -88,6 +93,7 @@ export function MemoryProvider({ children }) {
     profile,
     notes,
     loading,
+    profileLoading,
     saving,
     error,
 

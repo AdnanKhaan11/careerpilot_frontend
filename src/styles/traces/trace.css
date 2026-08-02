@@ -34,6 +34,7 @@
 }
 
 .trace-bar-pinned { position: sticky; top: 0; }
+.trace-bar-collapsed { cursor: pointer; }
 
 .trace-bar-indicator {
   width: .55rem;
@@ -59,6 +60,26 @@
   transition: background var(--cp-duration-fast) var(--cp-ease);
 }
 
+.trace-bar-mini-graph { display: none; align-items: center; gap: .25rem; margin-left: auto; }
+.trace-bar-mini-node { width: .5rem; height: .5rem; border-radius: 50%; background: rgb(100 116 139); }
+.trace-bar-mini-node + .trace-bar-mini-node { position: relative; margin-left: .35rem; }
+.trace-bar-mini-node + .trace-bar-mini-node::before { position: absolute; right: calc(100% + .08rem); top: 50%; width: .25rem; height: 1px; background: var(--cp-border); content: ""; }
+.trace-bar-mini-running { background: rgb(250 204 21); box-shadow: 0 0 .55rem rgb(250 204 21 / .65); animation: trace-pulse 1.25s ease-in-out infinite; }
+.trace-bar-mini-success { background: rgb(52 211 153); }
+.trace-bar-mini-failed { background: rgb(248 113 113); }
+
+.trace-metric-card { position: relative; overflow: hidden; transition: transform var(--cp-duration-normal) var(--cp-ease), border-color var(--cp-duration-normal) var(--cp-ease); }
+.trace-metric-card:hover { border-color: rgb(34 211 238 / .4); transform: translateY(-2px); }
+
+.trace-loading-state { display: grid; gap: 1rem; padding: 2rem; border: 1px solid var(--cp-border); border-radius: var(--cp-radius-xl); background: var(--cp-bg-secondary); }
+.trace-loading-state span { height: 3.5rem; border-radius: var(--cp-radius-md); background: linear-gradient(110deg, var(--cp-bg-tertiary) 35%, rgb(255 255 255 / .08) 50%, var(--cp-bg-tertiary) 65%); background-size: 200% 100%; animation: trace-shimmer 1.4s linear infinite; }
+.trace-empty-state { display: flex; min-height: 26rem; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; border: 1px dashed var(--cp-border); border-radius: var(--cp-radius-xl); color: var(--cp-text-muted); text-align: center; }
+.trace-empty-state h2 { margin-top: 1rem; color: var(--cp-text-primary); font-size: 1.125rem; font-weight: 600; }
+.trace-empty-state p { max-width: 23rem; margin-top: .5rem; font-size: .875rem; line-height: 1.5; }
+.trace-empty-orbit { width: 2.75rem; height: 2.75rem; border: 2px solid rgb(34 211 238 / .25); border-top-color: rgb(34 211 238); border-radius: 50%; animation: trace-orbit 2s linear infinite; }
+.trace-error-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid rgb(248 113 113 / .3); border-radius: var(--cp-radius-lg); background: rgb(127 29 29 / .2); color: rgb(252 165 165); }
+.trace-error-card button { border: 1px solid rgb(248 113 113 / .4); border-radius: var(--cp-radius-sm); padding: .5rem .75rem; font-size: .875rem; color: rgb(254 202 202); }
+
 .trace-bar-button:hover,
 .trace-bar-reveal:hover { background: var(--cp-bg-tertiary); }
 
@@ -75,7 +96,11 @@
 @keyframes trace-pulse {
   50% { transform: scale(1.25); opacity: .65; }
 }
+@keyframes trace-shimmer { to { background-position: -200% 0; } }
+@keyframes trace-orbit { to { transform: rotate(360deg); } }
 
 @media (max-width: 1023px) {
   .trace-page-grid { grid-template-columns: 1fr; }
 }
+
+@media (min-width: 768px) { .trace-bar-mini-graph { display: flex; } }

@@ -26,6 +26,13 @@
   background: rgb(100 116 139);
 }
 
+.trace-timeline-duration { display: block; width: 100%; max-width: 13rem; height: .25rem; margin-top: .45rem; overflow: hidden; border-radius: var(--cp-radius-full); background: var(--cp-bg-tertiary); }
+.trace-timeline-duration span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, rgb(34 211 238 / .55), rgb(34 211 238)); transition: width .45s var(--cp-ease); }
+.trace-timeline-category-llm .trace-timeline-duration span { background: linear-gradient(90deg, rgb(147 51 234 / .55), rgb(192 132 252)); }
+.trace-timeline-category-tool .trace-timeline-duration span { background: linear-gradient(90deg, rgb(234 88 12 / .55), rgb(251 146 60)); }
+.trace-timeline-category-memory .trace-timeline-duration span, .trace-timeline-category-workingmemory .trace-timeline-duration span { background: linear-gradient(90deg, rgb(8 145 178 / .55), rgb(34 211 238)); }
+.trace-timeline-category-planner .trace-timeline-duration span { background: linear-gradient(90deg, rgb(202 138 4 / .55), rgb(250 204 21)); }
+
 .trace-timeline-running { background: rgb(34 211 238); animation: trace-pulse 1.5s ease-in-out infinite; }
 .trace-timeline-success { background: rgb(52 211 153); box-shadow: 0 0 .75rem rgb(52 211 153 / .35); }
 .trace-timeline-failed { background: rgb(248 113 113); box-shadow: 0 0 .75rem rgb(248 113 113 / .35); }

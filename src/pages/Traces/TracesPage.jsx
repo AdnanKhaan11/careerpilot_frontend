@@ -1,5 +1,5 @@
 import { Activity } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import TraceDetails from "../../components/traces/TraceDetails";
 import TraceMetrics from "../../components/traces/TraceMetrics";
@@ -12,10 +12,12 @@ import useTraces from "../../hooks/useTraces";
 export default function TracesPage() {
   const { activeTrace, error, loadTraces, loading, metrics, selectTrace, traces } = useTraces();
   const [filter, setFilter] = useState("all");
+  const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedNode, setSelectedNode] = useState(null);
   const [expanded, setExpanded] = useState(new Set());
   const [autoScroll, setAutoScroll] = useState(true);
+  const [replayStep, setReplayStep] = useState(null);
 
   const nodes = useMemo(() => normalizeNodes(activeTrace?.nodes), [activeTrace]);
 
@@ -24,13 +26,27 @@ export default function TracesPage() {
 
     return traces.filter((trace) => {
       const matchesFilter = filter === "all" || trace.status === filter;
-      const matchesSearch = !query || [trace.trace_id, trace.name, trace.conversation_id]
+      const matchesCategory = category === "all" || trace.category === category || trace.categories?.includes(category);
+      const searchableNodes = Object.values(trace.nodes ?? {});
+      const matchesSearch = !query || [trace.trace_id, trace.name, trace.conversation_id, trace.status, ...searchableNodes.flatMap((node) => [node.name, node.category, node.tool_name])]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query));
 
-      return matchesFilter && matchesSearch;
+      return matchesFilter && matchesCategory && matchesSearch;
     });
-  }, [filter, search, traces]);
+  }, [category, filter, search, traces]);
+
+  useEffect(() => {
+    if (replayStep === null) return undefined;
+
+    if (replayStep > Object.keys(nodes).length) {
+      const timeout = window.setTimeout(() => setReplayStep(null), 700);
+      return () => window.clearTimeout(timeout);
+    }
+
+    const timeout = window.setTimeout(() => setReplayStep((step) => step + 1), 500);
+    return () => window.clearTimeout(timeout);
+  }, [nodes, replayStep]);
 
   function toggleNode(nodeId) {
     setExpanded((current) => {
@@ -50,6 +66,10 @@ export default function TracesPage() {
     await loadTraces();
 
     if (activeTrace?.trace_id) await selectTrace(activeTrace.trace_id);
+  }
+
+  function replay() {
+    if (Object.keys(nodes).length > 0) setReplayStep(1);
   }
 
   return (
@@ -72,16 +92,28 @@ export default function TracesPage() {
           onCollapseAll={() => setExpanded(new Set())}
           onExpandAll={() => setExpanded(new Set(Object.keys(nodes)))}
           onRefresh={refresh}
+          onReplay={replay}
           onToggleAutoScroll={() => setAutoScroll((value) => !value)}
         />
       </header>
 
-      {error && <div className="mb-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">{error}</div>}
+      {error && (
+        <div className="trace-error-card mb-5">
+          <div>
+            <p className="font-semibold">Trace data is unavailable</p>
+            <p className="mt-1 text-sm text-red-200/80">{error}</p>
+          </div>
+
+          <button onClick={loadTraces} type="button">Retry</button>
+        </div>
+      )}
 
       <div className="trace-page-grid">
         <TraceSidebar
           activeTraceId={activeTrace?.trace_id}
+          category={category}
           filter={filter}
+          onCategoryChange={setCategory}
           onFilterChange={setFilter}
           onSearchChange={setSearch}
           onSelect={handleSelectTrace}
@@ -91,7 +123,7 @@ export default function TracesPage() {
 
         <div className="min-w-0 space-y-5">
           {loading && !activeTrace ? (
-            <div className="rounded-2xl border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)] p-10 text-center text-sm text-[var(--cp-text-muted)]">Loading traces...</div>
+            <div className="trace-loading-state" aria-label="Loading traces"><span /><span /><span /><span /></div>
           ) : activeTrace ? (
             <>
               <TraceMetrics metrics={metrics} nodeCount={Object.keys(nodes).length} />
@@ -101,10 +133,10 @@ export default function TracesPage() {
                 <TraceDetails node={selectedNode} trace={activeTrace} />
               </div>
 
-              <TraceTree expanded={expanded} nodes={nodes} onSelect={setSelectedNode} onToggle={toggleNode} selectedNodeId={selectedNode?.node_id} />
+              <TraceTree expanded={expanded} nodes={nodes} onSelect={setSelectedNode} onToggle={toggleNode} replayStep={replayStep} selectedNodeId={selectedNode?.node_id} />
             </>
           ) : (
-            <div className="rounded-2xl border border-dashed border-[var(--cp-border)] p-10 text-center text-sm text-[var(--cp-text-muted)]">Select a trace to inspect its execution.</div>
+            <div className="trace-empty-state"><span className="trace-empty-orbit" /><h2>No traces yet</h2><p>When CareerPilot runs, its execution graph and runtime details will appear here.</p></div>
           )}
         </div>
       </div>

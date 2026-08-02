@@ -9,6 +9,7 @@ export default function TraceTimeline({ autoScroll, nodes, onSelect, selectedNod
   const timelineNodes = Object.values(nodes ?? {}).sort((left, right) =>
     (left.started_at ?? "").localeCompare(right.started_at ?? ""),
   );
+  const longestDuration = Math.max(...timelineNodes.map((node) => Number(node.duration_ms) || 0), 1);
 
   useEffect(() => {
     if (!autoScroll) return;
@@ -23,7 +24,7 @@ export default function TraceTimeline({ autoScroll, nodes, onSelect, selectedNod
       <div className="trace-timeline">
         {timelineNodes.map((node) => (
           <motion.button
-            className={`trace-timeline-item ${
+            className={`trace-timeline-item trace-timeline-category-${String(node.category ?? "runtime").toLowerCase()} ${
               selectedNodeId === node.node_id ? "trace-timeline-item-active" : ""
             }`}
             initial={{ opacity: 0, y: 8 }}
@@ -41,6 +42,10 @@ export default function TraceTimeline({ autoScroll, nodes, onSelect, selectedNod
 
               <span className="text-xs text-[var(--cp-text-muted)]">
                 {node.duration_ms?.toFixed(0) ?? "—"} ms
+              </span>
+
+              <span className="trace-timeline-duration" aria-hidden="true">
+                <span style={{ width: `${Math.max(((Number(node.duration_ms) || 0) / longestDuration) * 100, 8)}%` }} />
               </span>
             </span>
 

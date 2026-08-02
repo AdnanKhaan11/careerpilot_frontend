@@ -1,0 +1,9 @@
+.trace-node + .trace-node { margin-top: .125rem; }
+
+.trace-node button:focus-visible,
+.trace-timeline-item:focus-visible,
+.trace-bar-button:focus-visible,
+.trace-filter:focus-visible {
+  outline: 2px solid rgb(34 211 238);
+  outline-offset: 2px;
+}

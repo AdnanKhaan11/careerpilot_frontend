@@ -21,3 +21,9 @@
 /* ---------- Animations ---------- */
 
 @import "./animations/animations.css";
+
+/* ---------- Traces ---------- */
+
+@import "./traces/trace.css";
+@import "./traces/timeline.css";
+@import "./traces/nodes.css";

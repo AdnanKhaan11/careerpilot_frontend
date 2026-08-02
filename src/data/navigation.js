@@ -1,4 +1,5 @@
 import {
+  LayoutDashboard,
   MessageSquare,
   Briefcase,
   Brain,
@@ -8,9 +9,15 @@ import {
 
 const navigation = [
   {
+    id: "dashboard",
+    title: "Dashboard",
+    path: "/",
+    icon: LayoutDashboard,
+  },
+  {
     id: "chat",
     title: "AI Chat",
-    path: "/",
+    path: "/chat",
     icon: MessageSquare,
   },
   {

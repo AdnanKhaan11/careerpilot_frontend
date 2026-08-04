@@ -55,14 +55,7 @@ export default function Sidebar() {
       {/* Navigation */}
       {/* ========================= */}
 
-      <nav
-        className="
-          flex-1
-          overflow-y-auto
-          px-4
-          py-5
-        "
-      >
+      <nav className="shrink-0 px-4 py-5">
         <div className="space-y-2">
           {navigation.map((item) => (
             <SidebarItem key={item.id} {...item} />

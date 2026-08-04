@@ -70,7 +70,7 @@ export default function MessageBubble({ role, content, streaming = false }) {
                 ml-auto
                 max-w-[82%]
                 rounded-2xl
-                bg-cyan-600
+                bg-[#0f6274]
                 px-5
                 py-4
                 text-white

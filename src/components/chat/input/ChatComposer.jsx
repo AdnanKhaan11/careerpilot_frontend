@@ -71,8 +71,7 @@ export default function ChatComposer() {
           shadow-lg
           transition-all
           duration-200
-          focus-within:border-cyan-500/40
-          focus-within:shadow-cyan-500/10
+          focus-within:border-[var(--cp-border)]
         "
       >
         {/* ============================ */}
@@ -101,6 +100,9 @@ export default function ChatComposer() {
               text-[15px]
               leading-7
               outline-none
+              focus-visible:outline-none
+              focus-visible:ring-1
+              focus-visible:ring-cyan-500/15
               placeholder:text-[var(--cp-text-muted)]
             "
           />

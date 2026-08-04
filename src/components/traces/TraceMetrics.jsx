@@ -4,8 +4,8 @@ export default function TraceMetrics({ metrics }) {
   const cards = [
     { title: "LLM Calls", value: metrics?.llm_count ?? 0, subtitle: "Model invocations", icon: Brain },
     { title: "Tool Calls", value: metrics?.tool_count ?? 0, subtitle: "External tools", icon: Wrench },
-    { title: "Memory", value: metrics?.memory_count ?? 0, subtitle: "Memory operations", icon: Database },
-    { title: "Tokens", value: (metrics?.token_usage?.total_tokens ?? 0).toLocaleString(), subtitle: "Consumed", icon: Coins },
+    { title: "Memory", value: getMemoryCount(metrics), subtitle: "Memory operations", icon: Database },
+    { title: "Tokens", value: getTokenCount(metrics).toLocaleString(), subtitle: "Consumed", icon: Coins },
   ];
 
   return (
@@ -27,4 +27,37 @@ export default function TraceMetrics({ metrics }) {
       ))}
     </section>
   );
+}
+
+function getMemoryCount(metrics) {
+  return firstNumber([
+    metrics?.memory_count,
+    metrics?.memory_operations,
+    metrics?.memory?.count,
+    metrics?.memory?.total,
+    metrics?.memory_usage?.total,
+    sum(metrics?.memory_lookups, metrics?.memory_writes, metrics?.memory_retrieved),
+  ]);
+}
+
+function getTokenCount(metrics) {
+  const usage = metrics?.token_usage ?? metrics?.tokens ?? metrics?.usage;
+  return firstNumber([
+    usage?.total_tokens,
+    usage?.total,
+    metrics?.total_tokens,
+    sum(usage?.prompt_tokens, usage?.completion_tokens),
+    sum(usage?.input_tokens, usage?.output_tokens),
+  ]);
+}
+
+function firstNumber(values) {
+  const numericValues = values.filter((value) => Number.isFinite(Number(value)));
+  return numericValues.find((value) => Number(value) > 0) ?? numericValues[0] ?? 0;
+}
+
+function sum(...values) {
+  return values.every((value) => Number.isFinite(Number(value)))
+    ? values.reduce((total, value) => total + Number(value), 0)
+    : undefined;
 }

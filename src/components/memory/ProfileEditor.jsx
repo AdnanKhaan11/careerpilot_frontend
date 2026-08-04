@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Save, Loader2, Brain } from "lucide-react";
 
 import { useMemoryContext } from "../../context/MemoryContext";
@@ -12,31 +12,12 @@ export default function ProfileEditor() {
 
   const [dirty, setDirty] = useState(false);
 
-  const textareaRef = useRef(null);
-
   //------------------------------------------------------
 
   useEffect(() => {
     setDraft(profile);
     setDirty(false);
   }, [profile]);
-
-  //------------------------------------------------------
-
-  const resizeTextarea = useCallback(() => {
-    const textarea = textareaRef.current;
-
-    if (!textarea) return;
-
-    textarea.style.height = "0px";
-    textarea.style.height = `${Math.max(textarea.scrollHeight, 420)}px`;
-  }, []);
-
-  //------------------------------------------------------
-
-  useEffect(() => {
-    resizeTextarea();
-  }, [draft, resizeTextarea]);
 
   //------------------------------------------------------
 
@@ -136,7 +117,6 @@ export default function ProfileEditor() {
       {/* Editor */}
 
       <textarea
-        ref={textareaRef}
         value={draft}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -153,10 +133,11 @@ Career Goal: AI Engineer
 
 Write anything you want CareerPilot to remember permanently.`}
         className="
-          min-h-[420px]
+          h-[420px]
+          max-h-[60vh]
           w-full
           resize-none
-          overflow-hidden
+          overflow-y-auto
           rounded-2xl
           border
           border-[var(--cp-border)]

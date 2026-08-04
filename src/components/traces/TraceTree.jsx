@@ -80,12 +80,21 @@ function GraphEdge({ edge, graph }) {
   const source = graph.nodes.find(({ node }) => node.node_id === edge.from);
   const target = graph.nodes.find(({ node }) => node.node_id === edge.to);
   if (!source || !target) return null;
-  const startX = source.x + nodeWidth / 2;
-  const startY = source.y + nodeHeight;
-  const endX = target.x + nodeWidth / 2;
-  const endY = target.y;
-  const controlY = startY + (endY - startY) / 2;
-  return <path d={`M ${startX} ${startY} C ${startX} ${controlY}, ${endX} ${controlY}, ${endX} ${endY}`} markerEnd="url(#runtime-arrow)" className="trace-runtime-edge" />;
+  const sourceCenterY = source.y + nodeHeight / 2;
+  const targetCenterY = target.y + nodeHeight / 2;
+  const targetIsBelow = target.y >= source.y + nodeHeight;
+  const targetIsAbove = target.y + nodeHeight <= source.y;
+  const startX = targetIsBelow || targetIsAbove ? source.x + nodeWidth / 2 : source.x + nodeWidth;
+  const startY = targetIsBelow ? source.y + nodeHeight : targetIsAbove ? source.y : sourceCenterY;
+  const endX = targetIsBelow || targetIsAbove ? target.x + nodeWidth / 2 : target.x;
+  const endY = targetIsBelow ? target.y : targetIsAbove ? target.y + nodeHeight : targetCenterY;
+  const horizontal = !targetIsBelow && !targetIsAbove;
+  const distance = horizontal ? endX - startX : endY - startY;
+  const control = Math.max(34, Math.abs(distance) * .42) * Math.sign(distance || 1);
+  const path = horizontal
+    ? `M ${startX} ${startY} C ${startX + control} ${startY}, ${endX - control} ${endY}, ${endX} ${endY}`
+    : `M ${startX} ${startY} C ${startX} ${startY + control}, ${endX} ${endY - control}, ${endX} ${endY}`;
+  return <path d={path} markerEnd="url(#runtime-arrow)" className="trace-runtime-edge" />;
 }
 
 function GraphNode({ graphNode, index, isLive, onSelect, selected }) {

@@ -35,4 +35,16 @@ export default function NodeDetailsModal({ node, onClose }) {
 }
 
 function Meta({ icon: Icon, label, value }) { return <div className="rounded-xl border border-[var(--cp-border)] bg-[var(--cp-bg-primary)] p-3"><p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[.12em] text-[var(--cp-text-muted)]">{Icon && <Icon size={12} />}{label}</p><p className="mt-1 break-words text-xs font-medium text-[var(--cp-text-secondary)]">{value}</p></div>; }
-function Payload({ error = false, icon: Icon, label, value }) { if (value === undefined || value === null) return null; return <section><h3 className={`mb-2 flex items-center gap-2 text-xs font-semibold ${error ? "text-red-300" : "text-[var(--cp-text-primary)]"}`}><Icon size={14} />{label}</h3><pre className={`max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-xl border p-3 text-xs leading-5 ${error ? "border-red-500/30 bg-red-950/20 text-red-100" : "border-[var(--cp-border)] bg-[var(--cp-bg-primary)] text-[var(--cp-text-secondary)]"}`}>{typeof value === "object" ? JSON.stringify(value, null, 2) : String(value)}</pre></section>; }
+function Payload({ error = false, icon: Icon, label, value }) { if (value === undefined || value === null) return null; return <section><h3 className={`mb-2 flex items-center gap-2 text-xs font-semibold ${error ? "text-red-300" : "text-[var(--cp-text-primary)]"}`}><Icon size={14} />{label}</h3><pre className={`max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-xl border p-3 font-mono text-xs leading-5 ${error ? "border-red-500/30 bg-red-950/20 text-red-100" : "border-[var(--cp-border)] bg-[var(--cp-bg-primary)] text-[var(--cp-text-secondary)]"}`}><SyntaxValue value={value} /></pre></section>; }
+
+function SyntaxValue({ value }) {
+  const text = typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+  const parts = text.split(/("(?:\\.|[^"\\])*")(?=\s*:)|(\"(?:\\.|[^\"\\])*\")|\b(true|false|null)\b|(-?\d+(?:\.\d+)?)/g);
+  return parts.map((part, index) => {
+    if (!part) return null;
+    if (/^"/.test(part)) return <span key={index} className="text-cyan-300">{part}</span>;
+    if (/^(true|false|null)$/.test(part)) return <span key={index} className="text-violet-300">{part}</span>;
+    if (/^-?\d/.test(part)) return <span key={index} className="text-amber-300">{part}</span>;
+    return <span key={index}>{part}</span>;
+  });
+}

@@ -21,6 +21,12 @@ export default function useChat() {
 
   const [error, setError] = useState("");
 
+  function notifyRuntime(active) {
+    window.dispatchEvent(
+      new CustomEvent("careerpilot:runtime-execution", { detail: { active } }),
+    );
+  }
+
   //----------------------------------------------------
   // Load conversation list
   //----------------------------------------------------
@@ -129,6 +135,7 @@ export default function useChat() {
     try {
       setSending(true);
       setError("");
+      notifyRuntime(true);
 
       //--------------------------------------------------
       // User message
@@ -200,6 +207,7 @@ export default function useChat() {
 
           onTool(tool) {
             console.log("Tool:", tool);
+            notifyRuntime(true);
           },
 
           //--------------------------------------------------
@@ -239,6 +247,7 @@ export default function useChat() {
             //--------------------------------------------------
 
             loadConversations();
+            notifyRuntime(false);
           },
 
           //--------------------------------------------------
@@ -262,11 +271,13 @@ export default function useChat() {
 
               return updated;
             });
+            notifyRuntime(false);
           },
         },
       );
     } catch (error) {
       setError(error.message);
+      notifyRuntime(false);
     } finally {
       setSending(false);
     }

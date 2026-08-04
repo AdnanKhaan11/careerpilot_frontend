@@ -4,15 +4,12 @@ import { Brain, Cpu, Database, GitBranch, ShieldCheck, Sparkles, Wrench } from "
 import { TRACE_CATEGORY_LABELS, TRACE_STATUS_LABELS } from "../../constants/trace";
 
 const categoryIcons = { LLM: Brain, Tool: Wrench, Retriever: Database, Memory: Database, WorkingMemory: Cpu, Planner: GitBranch, Safety: ShieldCheck };
-const graphWidth = 900;
 const nodeWidth = 188;
 const nodeHeight = 66;
-const columnXs = [78, 356, 634];
 
-export default function TraceTree({ nodes, onSelect, selectedNodeId }) {
+export default function TraceTree({ nodes, onSelect, runtimeLive, selectedNodeId }) {
   const graph = createGraph(Object.values(nodes ?? {}));
-  const graphHeight = Math.max(330, graph.nodes.length * 96 + 60);
-  const isLive = graph.nodes.some(({ node }) => node.status === "running");
+  const isLive = runtimeLive && graph.nodes.some(({ node }) => node.status === "running");
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)] shadow-xl">
@@ -23,8 +20,8 @@ export default function TraceTree({ nodes, onSelect, selectedNodeId }) {
 
       {graph.nodes.length === 0 ? <div className="flex h-64 items-center justify-center text-sm text-[var(--cp-text-muted)]">No execution graph available.</div> : (
         <div className={`trace-runtime-canvas overflow-auto p-4 ${isLive ? "trace-runtime-live" : ""}`}>
-          <div className="relative mx-auto min-w-[900px]" style={{ height: graphHeight }}>
-            <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${graphWidth} ${graphHeight}`} preserveAspectRatio="none">
+          <div className="relative mx-auto" style={{ height: graph.height, minWidth: graph.width, width: graph.width }}>
+            <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${graph.width} ${graph.height}`} preserveAspectRatio="none">
               <defs><linearGradient id="runtime-edge" x1="0" x2="1"><stop stopColor="#22d3ee" stopOpacity=".18" /><stop offset=".5" stopColor="#22d3ee" stopOpacity=".72" /><stop offset="1" stopColor="#38bdf8" stopOpacity=".2" /></linearGradient><marker id="runtime-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#22d3ee" fillOpacity=".7" /></marker></defs>
               {graph.edges.map((edge) => <GraphEdge key={`${edge.from}-${edge.to}`} edge={edge} graph={graph} />)}
             </svg>
@@ -37,17 +34,46 @@ export default function TraceTree({ nodes, onSelect, selectedNodeId }) {
 }
 
 function createGraph(items) {
-  const nodes = [...items].sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? "")).map((node, index) => ({ node, x: columnXs[index % columnXs.length], y: 28 + index * 96 }));
+  const ordered = [...items].sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? ""));
+  let mainDepth = 0;
+  let topCount = 0;
+  let bottomCount = 0;
+  const nodes = ordered.map((node, index) => {
+    const lane = getLane(node, index);
+    const branchX = 70 + Math.max(mainDepth, 1) * 172;
+    if (lane === "top") return { node, lane, x: branchX, y: 42 + topCount++ * 82 };
+    if (lane === "bottom") return { node, lane, x: branchX, y: 292 + bottomCount++ * 82 };
+    return { node, lane: "main", x: 44 + mainDepth++ * 172, y: 172 };
+  });
   const nodeIds = new Set(nodes.map(({ node }) => node.node_id));
   const edges = [];
+  let lastMain = null;
+  let pendingBranches = [];
 
-  nodes.forEach(({ node }, index) => {
+  nodes.forEach((graphNode) => {
+    const { node } = graphNode;
     const parents = [node.parent_id, node.parent_node_id, node.parent].flat().filter((id) => nodeIds.has(id));
-    if (parents.length) parents.forEach((from) => edges.push({ from, to: node.node_id }));
-    else if (index > 0) edges.push({ from: nodes[index - 1].node.node_id, to: node.node_id });
+    if (parents.length) {
+      parents.forEach((from) => edges.push({ from, to: node.node_id }));
+    } else if (graphNode.lane !== "main" && lastMain) {
+      edges.push({ from: lastMain.node.node_id, to: node.node_id });
+      pendingBranches.push(graphNode);
+    } else if (graphNode.lane === "main" && lastMain) {
+      edges.push({ from: lastMain.node.node_id, to: node.node_id });
+      pendingBranches.forEach((branch) => edges.push({ from: branch.node.node_id, to: node.node_id }));
+      pendingBranches = [];
+    }
+    if (graphNode.lane === "main") lastMain = graphNode;
   });
 
-  return { nodes, edges };
+  return { nodes, edges, height: Math.max(440, 390 + Math.max(bottomCount - 1, 0) * 82), width: Math.max(900, 110 + mainDepth * 172) };
+}
+
+function getLane(node, index) {
+  if (index === 0) return "main";
+  if (["Memory", "WorkingMemory", "Retriever", "Embedding", "Ranking"].includes(node.category)) return "top";
+  if (["Tool", "Safety"].includes(node.category)) return "bottom";
+  return "main";
 }
 
 function GraphEdge({ edge, graph }) {

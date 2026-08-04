@@ -9,6 +9,7 @@ import useTraces from "../../hooks/useTraces";
 export default function TracesPage() {
   const { activeTrace, error, loadTraces, loading, metrics, selectTrace, traces } = useTraces();
   const [selectedNode, setSelectedNode] = useState(null);
+  const [runtimeLive, setRuntimeLive] = useState(false);
   const nodes = useMemo(() => normalizeNodes(activeTrace?.nodes), [activeTrace]);
 
   useEffect(() => {
@@ -16,6 +17,31 @@ export default function TracesPage() {
       selectTrace(traces[0].trace_id);
     }
   }, [activeTrace, loading, selectTrace, traces]);
+
+  useEffect(() => {
+    async function refreshLiveTrace() {
+      const latestTraces = await loadTraces();
+      if (latestTraces[0]?.trace_id) await selectTrace(latestTraces[0].trace_id);
+    }
+
+    function handleRuntimeExecution(event) {
+      setRuntimeLive(Boolean(event.detail?.active));
+      refreshLiveTrace();
+    }
+
+    window.addEventListener("careerpilot:runtime-execution", handleRuntimeExecution);
+    return () => window.removeEventListener("careerpilot:runtime-execution", handleRuntimeExecution);
+  }, [loadTraces, selectTrace]);
+
+  useEffect(() => {
+    if (!runtimeLive) return undefined;
+    const poll = async () => {
+      const latestTraces = await loadTraces();
+      if (latestTraces[0]?.trace_id) await selectTrace(latestTraces[0].trace_id);
+    };
+    const interval = window.setInterval(poll, 1200);
+    return () => window.clearInterval(interval);
+  }, [loadTraces, runtimeLive, selectTrace]);
 
   async function refresh() {
     await loadTraces();
@@ -49,7 +75,7 @@ export default function TracesPage() {
       {activeTrace ? (
         <>
           <TraceMetrics metrics={metrics} />
-          <TraceTree nodes={nodes} onSelect={setSelectedNode} selectedNodeId={selectedNode?.node_id} />
+          <TraceTree nodes={nodes} onSelect={setSelectedNode} runtimeLive={runtimeLive} selectedNodeId={selectedNode?.node_id} />
           <NodeDetailsModal node={selectedNode} onClose={() => setSelectedNode(null)} />
         </>
       ) : (

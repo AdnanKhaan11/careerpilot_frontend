@@ -27,11 +27,17 @@ export function TraceProvider({ children }) {
 
       const response = await getTraces();
 
-      setTraces(Array.isArray(response) ? response : []);
+      const nextTraces = Array.isArray(response) ? response : [];
+
+      setTraces(nextTraces);
+
+      return nextTraces;
     } catch (error) {
       setTraces([]);
 
       setError(error.message);
+
+      return [];
     } finally {
       setLoading(false);
     }
@@ -57,6 +63,8 @@ export function TraceProvider({ children }) {
       setMetrics(null);
 
       setError(error.message);
+
+      return null;
     } finally {
       setLoading(false);
     }

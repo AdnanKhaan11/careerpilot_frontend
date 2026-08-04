@@ -1,28 +1,37 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import AppLayout from "../layouts/AppLayout";
 
-import ChatPage from "../pages/Chat/ChatPage";
 import ApplicationsPage from "../pages/Applications/ApplicationsPage";
 import MemoryPage from "../pages/Memory/MemoryPage";
 import SkillsPage from "../pages/Skills/SkillsPage";
 import SettingsPage from "../pages/Settings/SettingsPage";
-import NotFoundPage from "../pages/NotFound/NotFoundPage";
-import DashboardPage from "../pages/Dashboard/DashboardPage";
 import TracesPage from "../pages/Traces/TracesPage";
+import NotFoundPage from "../pages/NotFound/NotFoundPage";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<DashboardPage />} />
+        {/* ===================================================== */}
+        {/* AI Runtime becomes the application's home page */}
+        {/* ===================================================== */}
 
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/applications" element={<ApplicationsPage />} />
+        <Route path="/" element={<TracesPage />} />
+
+        {/* ===================================================== */}
+        {/* Workspace */}
+        {/* ===================================================== */}
+
+        <Route path="/traces" element={<Navigate to="/" replace />} />
+
         <Route path="/memory" element={<MemoryPage />} />
+
         <Route path="/skills" element={<SkillsPage />} />
+
+        <Route path="/applications" element={<ApplicationsPage />} />
+
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/traces" element={<TracesPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

@@ -18,76 +18,75 @@ export default function MessageBubble({ role, content, streaming = false }) {
 
     setCopied(true);
 
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    setTimeout(() => setCopied(false), 1800);
   }
 
   //----------------------------------------------------------
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: 12,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.18,
-      }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18 }}
       className={`flex ${isUser ? "justify-end" : "justify-start"}`}
     >
-      <div
-        className={`w-full max-w-5xl ${
-          isUser ? "flex flex-col items-end" : ""
-        }`}
-      >
-        {/* ====================================================== */}
-        {/* USER HEADER */}
-        {/* ====================================================== */}
-
-        {isUser && (
-          <div className="mb-2 flex w-full justify-end">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-[var(--cp-text-muted)]">You</span>
-
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-white">
-                <User size={15} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ====================================================== */}
-        {/* ASSISTANT HEADER */}
-        {/* ====================================================== */}
-
-        {!isUser && (
-          <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-white">
-              <Bot size={15} />
-            </div>
-
-            <span className="font-semibold">CareerPilot</span>
-          </div>
-        )}
-
-        {/* ====================================================== */}
-        {/* MESSAGE */}
-        {/* ====================================================== */}
+      <div className="w-full max-w-3xl">
+        {/* ======================== */}
+        {/* Header */}
+        {/* ======================== */}
 
         <div
-          className={`rounded-2xl px-5 py-4 leading-7 ${
-            isUser
-              ? "max-w-3xl bg-cyan-600 text-white"
-              : "w-full border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)]"
+          className={`mb-2 flex items-center gap-3 ${
+            isUser ? "justify-end" : ""
           }`}
         >
+          {!isUser ? (
+            <>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400">
+                <Bot size={18} />
+              </div>
+
+              <span className="text-sm font-semibold">CareerPilot</span>
+            </>
+          ) : (
+            <>
+              <span className="text-sm text-[var(--cp-text-muted)]">You</span>
+
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 text-white">
+                <User size={17} />
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* ======================== */}
+        {/* Message */}
+        {/* ======================== */}
+
+        <div
+          className={
+            isUser
+              ? `
+                ml-auto
+                max-w-[82%]
+                rounded-2xl
+                bg-cyan-600
+                px-5
+                py-4
+                text-white
+              `
+              : `
+                rounded-2xl
+                bg-[var(--cp-bg-primary)]
+                px-5
+                py-4
+              `
+          }
+        >
           {isUser ? (
-            <div className="whitespace-pre-wrap">{content}</div>
+            <div className="whitespace-pre-wrap break-words leading-7">
+              {content}
+            </div>
           ) : (
             <>
               <MarkdownRenderer>{content}</MarkdownRenderer>
@@ -110,24 +109,35 @@ export default function MessageBubble({ role, content, streaming = false }) {
           )}
         </div>
 
-        {/* ====================================================== */}
-        {/* COPY BUTTON */}
-        {/* ====================================================== */}
+        {/* ======================== */}
+        {/* Footer */}
+        {/* ======================== */}
 
         {!isUser && content && (
-          <div className="-mt-1 pr-4 flex justify-end">
+          <div className="mt-2 flex justify-end">
             <button
               onClick={copyMessage}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--cp-text-muted)] transition hover:bg-[var(--cp-bg-tertiary)]"
+              className="
+                flex
+                items-center
+                gap-2
+                rounded-lg
+                px-2
+                py-1
+                text-xs
+                text-[var(--cp-text-muted)]
+                transition
+                hover:bg-[var(--cp-bg-secondary)]
+              "
             >
               {copied ? (
                 <>
-                  <Check size={15} />
+                  <Check size={14} />
                   Copied
                 </>
               ) : (
                 <>
-                  <Copy size={15} />
+                  <Copy size={14} />
                   Copy
                 </>
               )}

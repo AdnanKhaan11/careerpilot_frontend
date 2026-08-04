@@ -1,50 +1,34 @@
-import {
-  LayoutDashboard,
-  MessageSquare,
-  Briefcase,
-  Brain,
-  BookOpen,
-  Activity,
-  Settings,
-} from "lucide-react";
+import { Activity, Brain, BookOpen, Briefcase, Settings } from "lucide-react";
 
 const navigation = [
   {
-    id: "dashboard",
-    title: "Dashboard",
+    id: "traces",
+    title: "AI Runtime",
     path: "/",
-    icon: LayoutDashboard,
+    icon: Activity,
   },
-  {
-    id: "chat",
-    title: "AI Chat",
-    path: "/chat",
-    icon: MessageSquare,
-  },
-  {
-    id: "applications",
-    title: "Applications",
-    path: "/applications",
-    icon: Briefcase,
-  },
+
   {
     id: "memory",
     title: "Memory",
     path: "/memory",
     icon: Brain,
   },
+
   {
     id: "skills",
     title: "Skills",
     path: "/skills",
     icon: BookOpen,
   },
+
   {
-    id: "traces",
-    title: "Traces",
-    path: "/traces",
-    icon: Activity,
+    id: "applications",
+    title: "Applications",
+    path: "/applications",
+    icon: Briefcase,
   },
+
   {
     id: "settings",
     title: "Settings",

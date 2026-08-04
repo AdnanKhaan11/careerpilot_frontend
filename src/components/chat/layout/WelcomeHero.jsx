@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 export default function WelcomeHero() {
   const hour = new Date().getHours();
@@ -10,15 +11,60 @@ export default function WelcomeHero() {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-12 text-center"
+      transition={{ duration: 0.3 }}
+      className="mb-8"
     >
-      <h1 className="mb-4 text-5xl font-bold">{greeting}</h1>
+      {/* Small Badge */}
 
-      <p className="mx-auto max-w-2xl text-lg text-[var(--cp-text-muted)]">
-        Your AI Career Operating System. Build resumes, prepare for interviews,
-        discover jobs, and grow your career.
+      <div
+        className="
+          inline-flex
+          items-center
+          gap-2
+          rounded-full
+          border
+          border-cyan-500/20
+          bg-cyan-500/10
+          px-3
+          py-1
+          text-xs
+          font-medium
+          text-cyan-400
+        "
+      >
+        <Sparkles size={14} />
+        CareerPilot AI
+      </div>
+
+      {/* Greeting */}
+
+      <h2
+        className="
+          mt-5
+          text-3xl
+          font-bold
+          tracking-tight
+        "
+      >
+        {greeting}
+      </h2>
+
+      {/* Description */}
+
+      <p
+        className="
+          mt-3
+          max-w-lg
+          text-sm
+          leading-7
+          text-[var(--cp-text-secondary)]
+        "
+      >
+        Ask questions, explore careers, use AI tools, retrieve memories, manage
+        applications, and inspect every runtime decision from one intelligent
+        workspace.
       </p>
     </motion.section>
   );

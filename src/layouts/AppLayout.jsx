@@ -4,11 +4,22 @@ import MainContent from "./components/MainContent";
 
 export default function AppLayout() {
   return (
-    <div className="flex min-h-screen bg-[var(--cp-bg-primary)] text-[var(--cp-text-primary)]">
+    <div
+      className="
+        flex
+        h-screen
+        overflow-hidden
+        bg-[var(--cp-bg-primary)]
+        text-[var(--cp-text-primary)]
+      "
+    >
+      {/* Desktop Sidebar */}
       <Sidebar />
 
+      {/* Mobile Sidebar */}
       <MobileSidebar />
 
+      {/* Main Workspace */}
       <MainContent />
     </div>
   );

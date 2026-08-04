@@ -101,8 +101,7 @@ export default function ChatComposer() {
               leading-7
               outline-none
               focus-visible:outline-none
-              focus-visible:ring-1
-              focus-visible:ring-cyan-500/15
+              focus-visible:ring-0
               placeholder:text-[var(--cp-text-muted)]
             "
           />

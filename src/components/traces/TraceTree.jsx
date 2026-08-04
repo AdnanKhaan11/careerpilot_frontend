@@ -47,20 +47,30 @@ function createGraph(items) {
   });
   const nodeIds = new Set(nodes.map(({ node }) => node.node_id));
   const edges = [];
+  const edgeIds = new Set();
   let lastMain = null;
   let pendingBranches = [];
+
+  function addEdge(from, to) {
+    if (!from || !to || from === to) return;
+    const id = `${from}-${to}`;
+    if (edgeIds.has(id)) return;
+    edgeIds.add(id);
+    edges.push({ from, to });
+  }
 
   nodes.forEach((graphNode) => {
     const { node } = graphNode;
     const parents = [node.parent_id, node.parent_node_id, node.parent].flat().filter((id) => nodeIds.has(id));
     if (parents.length) {
-      parents.forEach((from) => edges.push({ from, to: node.node_id }));
-    } else if (graphNode.lane !== "main" && lastMain) {
-      edges.push({ from: lastMain.node.node_id, to: node.node_id });
+      parents.forEach((from) => addEdge(from, node.node_id));
+    }
+    if (graphNode.lane !== "main" && lastMain) {
+      addEdge(lastMain.node.node_id, node.node_id);
       pendingBranches.push(graphNode);
     } else if (graphNode.lane === "main" && lastMain) {
-      edges.push({ from: lastMain.node.node_id, to: node.node_id });
-      pendingBranches.forEach((branch) => edges.push({ from: branch.node.node_id, to: node.node_id }));
+      addEdge(lastMain.node.node_id, node.node_id);
+      pendingBranches.forEach((branch) => addEdge(branch.node.node_id, node.node_id));
       pendingBranches = [];
     }
     if (graphNode.lane === "main") lastMain = graphNode;

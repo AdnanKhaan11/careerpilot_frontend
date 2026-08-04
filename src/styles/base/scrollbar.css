@@ -3,19 +3,28 @@
    ========================================================== */
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cp-bg-secondary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--cp-border);
+  background: color-mix(in srgb, var(--cp-text-muted) 28%, transparent);
   border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color .2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--cp-accent);
+  background: color-mix(in srgb, var(--cp-accent) 70%, transparent);
+  background-clip: padding-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--cp-text-muted) 35%, transparent) transparent;
 }

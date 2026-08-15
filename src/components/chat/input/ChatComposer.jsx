@@ -1,15 +1,20 @@
 import { useRef, useState } from "react";
 
 import { useChatContext } from "../../../context/ChatContext";
+import { useToast } from "../../../context/ToastContext";
+import { ATTACHMENTS } from "../../../constants/ui";
 
 import AttachmentButton from "./AttachmentButton";
+import AttachmentPreviewList from "./AttachmentPreviewList";
 import ComposerToolbar from "./ComposerToolbar";
 import SendButton from "./SendButton";
 
 export default function ChatComposer() {
   const { submitMessage, sending } = useChatContext();
+  const { showToast } = useToast() ?? {};
 
   const [message, setMessage] = useState("");
+  const [attachments, setAttachments] = useState([]);
 
   const textareaRef = useRef(null);
 
@@ -34,19 +39,60 @@ export default function ChatComposer() {
   };
 
   //----------------------------------------------------
+  // Attachments
+  //----------------------------------------------------
+
+  const handleFilesSelected = (files) => {
+    const maxSizeBytes = ATTACHMENTS.MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    const accepted = [];
+
+    for (const file of files) {
+      if (file.size > maxSizeBytes) {
+        showToast?.(
+          `${file.name} is larger than ${ATTACHMENTS.MAX_FILE_SIZE_MB}MB.`,
+          "error",
+        );
+        continue;
+      }
+
+      accepted.push(file);
+    }
+
+    setAttachments((previous) => {
+      const combined = [...previous, ...accepted];
+
+      if (combined.length > ATTACHMENTS.MAX_FILES) {
+        showToast?.(
+          `You can attach up to ${ATTACHMENTS.MAX_FILES} files at a time.`,
+          "error",
+        );
+      }
+
+      return combined.slice(0, ATTACHMENTS.MAX_FILES);
+    });
+  };
+
+  const removeAttachment = (index) => {
+    setAttachments((previous) => previous.filter((_, i) => i !== index));
+  };
+
+  //----------------------------------------------------
 
   const handleSend = async () => {
-    if (!message.trim() || sending) return;
+    if ((!message.trim() && attachments.length === 0) || sending) return;
 
     const text = message;
+    const files = attachments;
 
     setMessage("");
+    setAttachments([]);
 
     if (textareaRef.current) {
       textareaRef.current.style.height = "52px";
     }
 
-    await submitMessage(text);
+    await submitMessage(text, files);
   };
 
   //----------------------------------------------------
@@ -75,11 +121,24 @@ export default function ChatComposer() {
         "
       >
         {/* ============================ */}
+        {/* Attachment Previews */}
+        {/* ============================ */}
+
+        <AttachmentPreviewList
+          files={attachments}
+          onRemove={removeAttachment}
+        />
+
+        {/* ============================ */}
         {/* Input */}
         {/* ============================ */}
 
         <div className="flex items-end gap-3 px-4 pt-4">
-          <AttachmentButton />
+          <AttachmentButton
+            onFilesSelected={handleFilesSelected}
+            disabled={sending || attachments.length >= ATTACHMENTS.MAX_FILES}
+            count={attachments.length}
+          />
 
           <textarea
             ref={textareaRef}
@@ -107,7 +166,7 @@ export default function ChatComposer() {
           />
 
           <SendButton
-            disabled={!message.trim()}
+            disabled={!message.trim() && attachments.length === 0}
             loading={sending}
             onClick={handleSend}
           />

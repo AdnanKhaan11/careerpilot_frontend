@@ -14,3 +14,9 @@ export const UI = {
     xl: "1.5rem",
   },
 };
+
+export const ATTACHMENTS = {
+  MAX_FILES: 3,
+  MAX_FILE_SIZE_MB: 15,
+  ACCEPT: ".pdf,.doc,.docx,.txt,.md,.csv,.png,.jpg,.jpeg,.webp",
+};

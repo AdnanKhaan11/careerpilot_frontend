@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Brain,
   Cpu,
   Database,
   GitBranch,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Wrench,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 
 import {
@@ -38,6 +42,10 @@ const laneLabels = {
   bottom: "Tools & Actions",
 };
 
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 1.6;
+const ZOOM_STEP = 0.1;
+
 export default function TraceTree({
   nodes,
   onSelect,
@@ -47,6 +55,13 @@ export default function TraceTree({
   const graph = createGraph(Object.values(nodes ?? {}));
   const isLive =
     runtimeLive && graph.nodes.some(({ node }) => node.status === "running");
+  const [zoom, setZoom] = useState(1);
+
+  const zoomIn = () =>
+    setZoom((z) => Math.min(ZOOM_MAX, +(z + ZOOM_STEP).toFixed(2)));
+  const zoomOut = () =>
+    setZoom((z) => Math.max(ZOOM_MIN, +(z - ZOOM_STEP).toFixed(2)));
+  const zoomReset = () => setZoom(1);
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-[var(--cp-border)] bg-[var(--cp-bg-secondary)] shadow-xl">
@@ -59,9 +74,53 @@ export default function TraceTree({
             Runtime execution graph
           </h2>
         </div>
-        <span className="text-xs text-[var(--cp-text-muted)]">
-          {graph.nodes.length} nodes
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[var(--cp-text-muted)]">
+            {graph.nodes.length} nodes
+          </span>
+          {graph.nodes.length > 0 && (
+            <div className="flex items-center gap-1 rounded-lg border border-[var(--cp-border)] bg-[var(--cp-bg-primary)] p-0.5">
+              <button
+                type="button"
+                onClick={zoomOut}
+                disabled={zoom <= ZOOM_MIN}
+                aria-label="Zoom out"
+                title="Zoom out"
+                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--cp-text-secondary)] transition hover:bg-[var(--cp-bg-tertiary)] hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ZoomOut size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={zoomReset}
+                aria-label="Reset zoom"
+                title="Reset zoom"
+                className="min-w-[2.6rem] rounded-md px-1 text-center text-[10px] font-medium text-[var(--cp-text-muted)] transition hover:bg-[var(--cp-bg-tertiary)] hover:text-cyan-300"
+              >
+                {Math.round(zoom * 100)}%
+              </button>
+              <button
+                type="button"
+                onClick={zoomIn}
+                disabled={zoom >= ZOOM_MAX}
+                aria-label="Zoom in"
+                title="Zoom in"
+                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--cp-text-secondary)] transition hover:bg-[var(--cp-bg-tertiary)] hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ZoomIn size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={zoomReset}
+                aria-label="Reset zoom to 100%"
+                title="Reset zoom to 100%"
+                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--cp-text-secondary)] transition hover:bg-[var(--cp-bg-tertiary)] hover:text-cyan-300"
+              >
+                <RotateCcw size={12} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {graph.nodes.length === 0 ? (
@@ -72,96 +131,105 @@ export default function TraceTree({
         <div
           className={`trace-runtime-canvas overflow-auto p-4 ${isLive ? "trace-runtime-live" : ""}`}
         >
+          {/* Outer wrapper reserves the scaled scroll area; inner wrapper keeps the ORIGINAL,
+              untouched layout (same width/height graph logic always produced) and is purely
+              visually scaled via CSS transform — no node/edge math is affected by zoom. */}
           <div
             className="relative mx-auto"
-            style={{
-              height: graph.height,
-              minWidth: graph.width,
-              width: graph.width,
-            }}
+            style={{ height: graph.height * zoom, width: graph.width * zoom }}
           >
-            {/* Lane region panels — draws the "boxed section" architecture-diagram look */}
-            {Object.entries(graph.laneBoxes).map(([lane, box]) => (
-              <div
-                key={lane}
-                className={`trace-runtime-lane trace-runtime-lane-${lane}`}
-                style={{
-                  left: box.x,
-                  top: box.y,
-                  width: box.width,
-                  height: box.height,
-                }}
-              >
-                <span className="trace-runtime-lane-label">
-                  {laneLabels[lane]}
-                </span>
-              </div>
-            ))}
-
-            <svg
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 h-full w-full"
-              viewBox={`0 0 ${graph.width} ${graph.height}`}
-              preserveAspectRatio="none"
+            <div
+              className="absolute left-0 top-0"
+              style={{
+                height: graph.height,
+                width: graph.width,
+                transform: `scale(${zoom})`,
+                transformOrigin: "top left",
+              }}
             >
-              <defs>
-                <linearGradient id="runtime-edge" x1="0" x2="1">
-                  <stop stopColor="#22d3ee" stopOpacity=".55" />
-                  <stop offset=".5" stopColor="#22d3ee" stopOpacity=".95" />
-                  <stop offset="1" stopColor="#38bdf8" stopOpacity=".6" />
-                </linearGradient>
-                <linearGradient id="runtime-edge-branch" x1="0" x2="1">
-                  <stop stopColor="#a855f7" stopOpacity=".3" />
-                  <stop offset=".5" stopColor="#a855f7" stopOpacity=".75" />
-                  <stop offset="1" stopColor="#22d3ee" stopOpacity=".35" />
-                </linearGradient>
-                <marker
-                  id="runtime-arrow"
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="8"
-                  refY="5"
-                  orient="auto"
+              {/* Lane region panels — draws the "boxed section" architecture-diagram look */}
+              {Object.entries(graph.laneBoxes).map(([lane, box]) => (
+                <div
+                  key={lane}
+                  className={`trace-runtime-lane trace-runtime-lane-${lane}`}
+                  style={{
+                    left: box.x,
+                    top: box.y,
+                    width: box.width,
+                    height: box.height,
+                  }}
                 >
-                  <path
-                    d="M0,0 L10,5 L0,10 Z"
-                    fill="#22d3ee"
-                    fillOpacity=".9"
+                  <span className="trace-runtime-lane-label">
+                    {laneLabels[lane]}
+                  </span>
+                </div>
+              ))}
+
+              <svg
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 h-full w-full"
+                viewBox={`0 0 ${graph.width} ${graph.height}`}
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="runtime-edge" x1="0" x2="1">
+                    <stop stopColor="#22d3ee" stopOpacity=".55" />
+                    <stop offset=".5" stopColor="#22d3ee" stopOpacity=".95" />
+                    <stop offset="1" stopColor="#38bdf8" stopOpacity=".6" />
+                  </linearGradient>
+                  <linearGradient id="runtime-edge-branch" x1="0" x2="1">
+                    <stop stopColor="#a855f7" stopOpacity=".3" />
+                    <stop offset=".5" stopColor="#a855f7" stopOpacity=".75" />
+                    <stop offset="1" stopColor="#22d3ee" stopOpacity=".35" />
+                  </linearGradient>
+                  <marker
+                    id="runtime-arrow"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="8"
+                    refY="5"
+                    orient="auto"
+                  >
+                    <path
+                      d="M0,0 L10,5 L0,10 Z"
+                      fill="#22d3ee"
+                      fillOpacity=".9"
+                    />
+                  </marker>
+                  <marker
+                    id="runtime-arrow-branch"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="8"
+                    refY="5"
+                    orient="auto"
+                  >
+                    <path
+                      d="M0,0 L10,5 L0,10 Z"
+                      fill="#a855f7"
+                      fillOpacity=".8"
+                    />
+                  </marker>
+                </defs>
+                {graph.edges.map((edge) => (
+                  <GraphEdge
+                    key={`${edge.from}-${edge.to}`}
+                    edge={edge}
+                    graph={graph}
                   />
-                </marker>
-                <marker
-                  id="runtime-arrow-branch"
-                  markerWidth="10"
-                  markerHeight="10"
-                  refX="8"
-                  refY="5"
-                  orient="auto"
-                >
-                  <path
-                    d="M0,0 L10,5 L0,10 Z"
-                    fill="#a855f7"
-                    fillOpacity=".8"
-                  />
-                </marker>
-              </defs>
-              {graph.edges.map((edge) => (
-                <GraphEdge
-                  key={`${edge.from}-${edge.to}`}
-                  edge={edge}
-                  graph={graph}
+                ))}
+              </svg>
+              {graph.nodes.map((graphNode, index) => (
+                <GraphNode
+                  key={graphNode.node.node_id}
+                  graphNode={graphNode}
+                  index={index}
+                  isLive={isLive}
+                  onSelect={onSelect}
+                  selected={selectedNodeId === graphNode.node.node_id}
                 />
               ))}
-            </svg>
-            {graph.nodes.map((graphNode, index) => (
-              <GraphNode
-                key={graphNode.node.node_id}
-                graphNode={graphNode}
-                index={index}
-                isLive={isLive}
-                onSelect={onSelect}
-                selected={selectedNodeId === graphNode.node.node_id}
-              />
-            ))}
+            </div>
           </div>
         </div>
       )}

@@ -129,8 +129,8 @@ export default function useChat() {
   // Send Message
   //----------------------------------------------------
 
-  async function submitMessage(text) {
-    if (!text.trim() || sending) return;
+  async function submitMessage(text, files = []) {
+    if ((!text.trim() && files.length === 0) || sending) return;
 
     try {
       setSending(true);
@@ -144,6 +144,10 @@ export default function useChat() {
       const userMessage = {
         role: "user",
         content: text,
+        attachments: files.map((file) => ({
+          name: file.name,
+          size: file.size,
+        })),
       };
 
       //--------------------------------------------------
@@ -170,6 +174,7 @@ export default function useChat() {
         {
           message: text,
           conversationId: activeConversation?.id,
+          files,
         },
         {
           //--------------------------------------------------

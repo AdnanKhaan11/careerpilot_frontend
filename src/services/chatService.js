@@ -5,25 +5,37 @@ import api from "./api";
 //------------------------------------------------------
 
 export async function streamMessage(
-  { message, conversationId },
+  { message, conversationId, files = [] },
   { onStart, onChunk, onTool, onComplete, onError },
 ) {
   try {
+    const hasFiles = files.length > 0;
+
+    // With attachments we must send multipart/form-data so the browser can attach
+    // the raw file bytes — and the "Content-Type" header must be OMITTED so the
+    // browser can set its own boundary. Without attachments, behavior is byte-for-byte
+    // identical to before (same JSON body, same headers).
+    const requestInit = hasFiles
+      ? {
+          method: "POST",
+          headers: { Accept: "text/event-stream" },
+          body: buildAttachmentFormData({ message, conversationId, files }),
+        }
+      : {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+          },
+          body: JSON.stringify({
+            message,
+            conversation_id: conversationId,
+          }),
+        };
+
     const response = await fetch(
       `${import.meta.env.VITE_API_BASE_URL}/chat/stream`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-        },
-
-        body: JSON.stringify({
-          message,
-          conversation_id: conversationId,
-        }),
-      },
+      requestInit,
     );
 
     if (!response.ok) {
@@ -155,4 +167,30 @@ export async function deleteConversation(id) {
   const response = await api.delete(`/conversations/${id}`);
 
   return response.data;
+}
+
+//------------------------------------------------------
+// Attachments
+//------------------------------------------------------
+
+// NOTE: This assumes the backend's POST /chat/stream endpoint accepts
+// multipart/form-data with a "message", "conversation_id", and one "files"
+// entry per attached file (FastAPI: UploadFile = File(...)/List[UploadFile]).
+// If the backend instead expects a separate upload endpoint that returns a
+// file reference, point this function at that endpoint and adjust the field
+// names to match its contract.
+function buildAttachmentFormData({ message, conversationId, files }) {
+  const formData = new FormData();
+
+  formData.append("message", message ?? "");
+
+  if (conversationId) {
+    formData.append("conversation_id", conversationId);
+  }
+
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+
+  return formData;
 }

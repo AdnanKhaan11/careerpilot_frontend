@@ -1,10 +1,15 @@
 import { motion } from "framer-motion";
-import { Bot, User, Copy, Check } from "lucide-react";
+import { Bot, User, Copy, Check, File as FileIcon } from "lucide-react";
 import { useState } from "react";
 
 import MarkdownRenderer from "../../markdown/MarkdownRenderer";
 
-export default function MessageBubble({ role, content, streaming = false }) {
+export default function MessageBubble({
+  role,
+  content,
+  streaming = false,
+  attachments = [],
+}) {
   const isUser = role === "user";
 
   const [copied, setCopied] = useState(false);
@@ -84,8 +89,38 @@ export default function MessageBubble({ role, content, streaming = false }) {
           }
         >
           {isUser ? (
-            <div className="whitespace-pre-wrap break-words leading-7">
-              {content}
+            <div>
+              {attachments?.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {attachments.map((file, index) => (
+                    <span
+                      key={`${file.name}-${index}`}
+                      className="
+                        flex
+                        items-center
+                        gap-1.5
+                        rounded-lg
+                        border
+                        border-white/20
+                        bg-white/10
+                        px-2.5
+                        py-1
+                        text-xs
+                        font-medium
+                      "
+                    >
+                      <FileIcon size={12} />
+                      {file.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {content && (
+                <div className="whitespace-pre-wrap break-words leading-7">
+                  {content}
+                </div>
+              )}
             </div>
           ) : (
             <>

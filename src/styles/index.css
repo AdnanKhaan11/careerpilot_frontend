@@ -9,8 +9,8 @@
 /* ---------- Theme ---------- */
 
 @import "./theme/variables.css";
-@import "./theme/light.css";
 @import "./theme/dark.css";
+@import "./theme/light.css";
 
 /* ---------- Base ---------- */
 

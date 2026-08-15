@@ -1,18 +1,13 @@
-import { useState } from "react";
+import { useContext } from "react";
+
+import { SidebarContext } from "../context/SidebarContext";
 
 export default function useSidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const context = useContext(SidebarContext);
 
-  const openSidebar = () => setIsOpen(true);
+  if (!context) {
+    throw new Error("useSidebar must be used inside SidebarProvider");
+  }
 
-  const closeSidebar = () => setIsOpen(false);
-
-  const toggleSidebar = () => setIsOpen((previous) => !previous);
-
-  return {
-    isOpen,
-    openSidebar,
-    closeSidebar,
-    toggleSidebar,
-  };
+  return context;
 }

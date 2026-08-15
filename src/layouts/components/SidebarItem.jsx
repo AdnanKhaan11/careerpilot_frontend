@@ -1,13 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 
-export default function SidebarItem({ icon: Icon, title, path }) {
+export default function SidebarItem({
+  icon: Icon,
+  title,
+  path,
+  collapsed = false,
+}) {
   return (
-    <NavLink to={path}>
+    <NavLink to={path} title={collapsed ? title : undefined}>
       {({ isActive }) => (
         <motion.div
           whileHover={{
-            x: 4,
+            x: collapsed ? 0 : 4,
           }}
           whileTap={{
             scale: 0.98,
@@ -17,10 +22,9 @@ export default function SidebarItem({ icon: Icon, title, path }) {
             relative
             flex
             items-center
-            gap-4
+            ${collapsed ? "justify-center gap-0 px-0" : "gap-4 px-4"}
             overflow-hidden
             rounded-2xl
-            px-4
             py-3
             transition-all
             duration-300
@@ -73,6 +77,7 @@ export default function SidebarItem({ icon: Icon, title, path }) {
               flex
               h-10
               w-10
+              shrink-0
               items-center
               justify-center
               rounded-xl
@@ -91,24 +96,27 @@ export default function SidebarItem({ icon: Icon, title, path }) {
 
           {/* Title */}
 
-          <span
-            className="
-              flex-1
-              truncate
-              text-[15px]
-              font-medium
-            "
-          >
-            {title}
-          </span>
+          {!collapsed && (
+            <span
+              className="
+                flex-1
+                truncate
+                text-[15px]
+                font-medium
+              "
+            >
+              {title}
+            </span>
+          )}
 
           {/* Hover Dot */}
 
-          {!isActive && (
+          {!collapsed && !isActive && (
             <div
               className="
                 h-2
                 w-2
+                shrink-0
                 rounded-full
                 bg-cyan-400
                 opacity-0

@@ -1,6 +1,7 @@
 import { ThemeProvider } from "./ThemeContext";
 import { ToastProvider } from "./ToastContext";
 import { ModalProvider } from "./ModalContext";
+import { SidebarProvider } from "./SidebarContext";
 
 import { ChatProvider } from "./ChatContext";
 import { MemoryProvider } from "./MemoryContext";
@@ -15,19 +16,21 @@ export default function AppProviders({ children }) {
     <ThemeProvider>
       <ToastProvider>
         <ModalProvider>
-          <ChatProvider>
-            <DashboardProvider>
-              <MemoryProvider>
-                <ApplicationsProvider>
-                  <SkillsProvider>
-                    <SettingsProvider>
-                      <TraceProvider>{children}</TraceProvider>
-                    </SettingsProvider>
-                  </SkillsProvider>
-                </ApplicationsProvider>
-              </MemoryProvider>
-            </DashboardProvider>
-          </ChatProvider>
+          <SidebarProvider>
+            <ChatProvider>
+              <DashboardProvider>
+                <MemoryProvider>
+                  <ApplicationsProvider>
+                    <SkillsProvider>
+                      <SettingsProvider>
+                        <TraceProvider>{children}</TraceProvider>
+                      </SettingsProvider>
+                    </SkillsProvider>
+                  </ApplicationsProvider>
+                </MemoryProvider>
+              </DashboardProvider>
+            </ChatProvider>
+          </SidebarProvider>
         </ModalProvider>
       </ToastProvider>
     </ThemeProvider>

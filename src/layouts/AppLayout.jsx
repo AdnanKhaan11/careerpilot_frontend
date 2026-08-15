@@ -7,7 +7,7 @@ export default function AppLayout() {
     <div
       className="
         flex
-        h-screen
+        h-full
         overflow-hidden
         bg-[var(--cp-bg-primary)]
         text-[var(--cp-text-primary)]

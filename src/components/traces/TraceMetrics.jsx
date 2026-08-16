@@ -89,7 +89,8 @@ function firstNumber(values) {
 }
 
 function sum(...values) {
-  return values.every((value) => Number.isFinite(Number(value)))
-    ? values.reduce((total, value) => total + Number(value), 0)
+  const finiteValues = values.filter((value) => Number.isFinite(Number(value)));
+  return finiteValues.length
+    ? finiteValues.reduce((total, value) => total + Number(value), 0)
     : undefined;
 }

@@ -1,13 +1,41 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import Header from "./Header";
 import PageContainer from "./PageContainer";
 
 import ChatWorkspace from "../../components/chat/layout/ChatWorkspace";
 
+// Must match the xl breakpoint the desktop chat rail appears at below.
+const DESKTOP_RAIL_QUERY = "(min-width: 1280px)";
+
 export default function MainContent() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const isChatRoute = pathname === "/chat";
+
+  // /chat exists so mobile/tablet users (where the rail below is hidden) have
+  // a way to reach the composer. If the viewport is already wide enough for
+  // the rail — or gets resized past that point while /chat is open — bounce
+  // back to the runtime home instead of leaving the user stuck in a
+  // full-page chat view that no longer needs to exist.
+  useEffect(() => {
+    if (!isChatRoute) return undefined;
+
+    const query = window.matchMedia(DESKTOP_RAIL_QUERY);
+
+    if (query.matches) {
+      navigate("/", { replace: true });
+      return undefined;
+    }
+
+    const handleChange = (event) => {
+      if (event.matches) navigate("/", { replace: true });
+    };
+
+    query.addEventListener("change", handleChange);
+    return () => query.removeEventListener("change", handleChange);
+  }, [isChatRoute, navigate]);
 
   return (
     <main
@@ -15,6 +43,7 @@ export default function MainContent() {
         flex
         h-full
         min-w-0
+        flex-1
         overflow-hidden
         bg-[var(--cp-bg-primary)]
       "

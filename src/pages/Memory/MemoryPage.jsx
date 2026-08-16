@@ -23,7 +23,7 @@ export default function MemoryPage() {
   //----------------------------------------------------
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-8 py-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       <header>
         <h1 className="text-4xl font-bold">Memory</h1>
 

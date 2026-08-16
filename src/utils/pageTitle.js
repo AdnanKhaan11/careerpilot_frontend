@@ -1,5 +1,6 @@
 export const pageTitles = {
-  "/": "AI Chat",
+  "/": "AI Runtime",
+  "/chat": "AI Chat",
   "/applications": "Applications",
   "/memory": "Memory",
   "/skills": "Skills",

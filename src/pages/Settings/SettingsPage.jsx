@@ -25,7 +25,7 @@ export default function SettingsPage() {
   //------------------------------------------------------
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-8 py-8">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       {/* Header */}
 
       <div className="flex items-center gap-4">

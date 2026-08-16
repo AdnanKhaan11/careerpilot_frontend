@@ -1,4 +1,11 @@
-import { Activity, Brain, BookOpen, Briefcase, Settings } from "lucide-react";
+import {
+  Activity,
+  Brain,
+  BookOpen,
+  Briefcase,
+  MessageSquare,
+  Settings,
+} from "lucide-react";
 
 const navigation = [
   {
@@ -6,6 +13,17 @@ const navigation = [
     title: "AI Runtime",
     path: "/",
     icon: Activity,
+  },
+
+  {
+    id: "chat",
+    title: "AI Chat",
+    path: "/chat",
+    icon: MessageSquare,
+    // The desktop/tablet layout already shows a persistent AI Chat rail
+    // (MainContent's xl:flex aside), so this entry only needs to appear
+    // in the mobile drawer, where that rail is hidden.
+    mobileOnly: true,
   },
 
   {

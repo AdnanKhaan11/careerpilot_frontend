@@ -128,7 +128,16 @@ export default function Sidebar() {
       <nav className="shrink-0 px-4 py-5">
         <div className="space-y-2">
           {navigation.map((item) => (
-            <SidebarItem key={item.id} {...item} collapsed={isCollapsed} />
+            <div
+              key={item.id}
+              // At xl+ (1280px) the persistent AI Chat rail in MainContent is
+              // already visible, so this nav entry would just be a duplicate.
+              // Below that (including the 1024-1279px "tablet gap" where the
+              // rail isn't shown yet) it stays visible so chat is still reachable.
+              className={item.mobileOnly ? "xl:hidden" : ""}
+            >
+              <SidebarItem {...item} collapsed={isCollapsed} />
+            </div>
           ))}
         </div>
       </nav>

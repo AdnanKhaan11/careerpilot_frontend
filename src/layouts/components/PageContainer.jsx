@@ -19,8 +19,10 @@ export default function PageContainer({ children, className = "" }) {
         className="
           w-full
           min-h-full
-          px-6
-          py-6
+          px-4
+          py-5
+          sm:px-6
+          sm:py-6
           lg:px-8
           xl:px-10
         "
